@@ -97,13 +97,16 @@
     .demo-badge{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.demo-badge:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
     .btn.demo-locked{opacity:.58;cursor:not-allowed;box-shadow:none}.btn.demo-locked:hover{transform:none;border-color:var(--line)}
     .demo-lock-note{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-top:6px}
+    .btn.etsy-cta{background:var(--accent-2);border-color:var(--accent-2);color:#20251f;box-shadow:0 6px 18px rgba(0,0,0,.10)}
+    .btn.etsy-cta:hover{border-color:var(--accent-2);transform:translateY(-1px)}
+    .purchase-card{grid-column:1/-1;background:linear-gradient(128deg,var(--accent-soft),var(--surface));border-color:color-mix(in srgb,var(--accent) 25%,var(--line))}
     @media(max-width:980px){.stats{grid-template-columns:repeat(2,1fr)}.dash-grid,.analytics-grid,.settings-grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-art{display:none}}
     @media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;padding:7px 6px;border-right:0;border-top:1px solid var(--line)}.brand,.sidebar-foot{display:none}.nav{display:flex;overflow-x:hidden;gap:2px}.nav button{min-width:0;flex:1;justify-content:center;flex-direction:column;gap:2px;padding:7px 2px;font-size:9px}.nav svg{width:17px;height:17px}main{padding:20px 16px 100px}.mobile-head{display:block}.demo-banner{align-items:flex-start;flex-direction:column;gap:4px;padding:10px 12px;margin-bottom:15px}.topbar{align-items:flex-start}.top-actions .btn.primary{padding:9px 11px;font-size:13px}h1{font-size:29px}.top-actions .btn:not(.primary),.top-actions .btn.icon{display:none}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:16px}.hero{padding:22px}.hero h2{font-size:25px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-card{padding:9px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.dialog{padding:18px}.goal-card{grid-template-columns:1fr;text-align:center}.chart-row{grid-template-columns:90px 1fr 28px}}
     @media(max-width:420px){.stats{grid-template-columns:1fr}.book-grid{grid-template-columns:1fr 1fr}.book-meta small{font-size:11px}}
   </style>
 </head>
 <body>
-<!-- Shelfmark live demo. Premium import/export/backup code has been removed from this public build. -->
+<!-- Shelfmark live demo. Premium import/export/backup code has been removed from this public build. Set ETSY_LISTING_URL in the script when your listing is live. -->
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
@@ -126,7 +129,7 @@
 
     <section class="view active" id="dashboard-view">
       <div class="hero">
-        <div><div class="eyebrow" style="color:#b8eadb">Your next chapter</div><h2 id="hero-title">Your entire reading life, beautifully organized.</h2><p id="hero-copy">Track your library, TBR, series, goals, loans and reading stats — privately in your browser.</p><div class="actions"><button class="btn" id="pick-btn">Pick my next read</button><button class="btn ghost demo-locked" type="button" style="color:white;border-color:rgba(255,255,255,.35)" data-demo-locked="Goodreads & StoryGraph CSV import">CSV import in full version</button></div></div>
+        <div><div class="eyebrow" style="color:#b8eadb">Your next chapter</div><h2 id="hero-title">Your entire reading life, beautifully organized.</h2><p id="hero-copy">Track your library, TBR, series, goals, loans and reading stats — privately in your browser.</p><div class="actions"><button class="btn" id="pick-btn">Pick my next read</button><button class="btn etsy-cta" type="button" data-etsy-cta>Get Full Version on Etsy →</button></div></div>
         <div class="hero-art" aria-hidden="true"><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span></div>
       </div>
       <div class="grid stats" id="stats"></div>
@@ -161,6 +164,7 @@
         <div class="card setting"><div class="copy"><h3>Reset live demo</h3><p>Restore the original sample books, loan and reading goal.</p></div><button class="btn" id="sample-btn">Reset demo</button></div>
         <div class="card setting"><div class="copy"><h3>Accent colour</h3><p>Choose the colour used throughout Shelfmark.</p></div><select id="accent-select"><option value="#1d6b59">Evergreen</option><option value="#7a4d8e">Mulberry</option><option value="#2e6287">Ink blue</option><option value="#a85642">Terracotta</option></select></div>
         <div class="card setting"><div class="copy"><h3>Clear all data</h3><p>Available in the purchased version. The live demo always reloads with sample data.</p><div class="demo-lock-note">Full version feature</div></div><button class="btn danger demo-locked" type="button" data-demo-locked="Clear all data">Clear</button></div>
+        <div class="card setting purchase-card"><div class="copy"><h3>Love the demo?</h3><p>Get the complete Shelfmark app with CSV import, backup, restore, export and permanent local saving.</p></div><button class="btn etsy-cta" type="button" data-etsy-cta>Get Full Version on Etsy →</button></div>
       </div>
       <div class="footnote">Live demo: changes stay only for this page session and reset when you reload. The purchased Shelfmark app saves locally in your browser.</div>
     </section>
@@ -189,6 +193,8 @@
 (() => {
   "use strict";
   const STORAGE_KEY = "keptapps-shelfmark-v1";
+  // Paste your live Shelfmark Etsy listing URL between the quotes when published.
+  const ETSY_LISTING_URL = "";
   const navItems = [
     ["dashboard","Dashboard","⌂"],["library","Library","▤"],["series","Series","▥"],["goals","Goals","◎"],["loans","Loans","↗"],["analytics","Analytics","◫"],["settings","Settings","⚙"]
   ];
@@ -209,7 +215,9 @@
     {id:uid(),title:"The Man Who Died Twice",author:"Richard Osman",status:"Want to read",format:"Paperback",series:"Thursday Murder Club",seriesNumber:2,genre:"Mystery",tags:"cosy mystery",pages:422,year:2021,rating:0,spice:0,dateStarted:"",dateFinished:"",isbn:"",shelf:"Hall bookcase",cover:"",notes:"",added:Date.now()-500000},
     {id:uid(),title:"Project Hail Mary",author:"Andy Weir",status:"Finished",format:"Audiobook",series:"",seriesNumber:"",genre:"Science Fiction",tags:"space, survival",pages:496,year:2021,rating:5,spice:0,dateStarted:thisYear("04-02"),dateFinished:thisYear("04-17"),isbn:"",shelf:"Audio",cover:"",notes:"Smart, tense and full of heart.",added:Date.now()-400000},
     {id:uid(),title:"Tomorrow, and Tomorrow, and Tomorrow",author:"Gabrielle Zevin",status:"Reading",format:"Hardcover",series:"",seriesNumber:"",genre:"Literary Fiction",tags:"friendship, games",pages:416,year:2022,rating:0,spice:0,dateStarted:thisYear("05-09"),dateFinished:"",isbn:"",shelf:"Desk",cover:"",notes:"",added:Date.now()-300000},
-    {id:uid(),title:"The Very Secret Society of Irregular Witches",author:"Sangu Mandanna",status:"Want to read",format:"Paperback",series:"",seriesNumber:"",genre:"Fantasy",tags:"cosy, found family, witches",pages:336,year:2022,rating:0,spice:2,dateStarted:"",dateFinished:"",isbn:"",shelf:"Living room",cover:"",notes:"",added:Date.now()-200000}
+    {id:uid(),title:"The Very Secret Society of Irregular Witches",author:"Sangu Mandanna",status:"Want to read",format:"Paperback",series:"",seriesNumber:"",genre:"Fantasy",tags:"cosy, found family, witches",pages:336,year:2022,rating:0,spice:2,dateStarted:"",dateFinished:"",isbn:"",shelf:"Living room",cover:"",notes:"",added:Date.now()-200000},
+    {id:uid(),title:"Six of Crows",author:"Leigh Bardugo",status:"Finished",format:"Hardcover",series:"Six of Crows",seriesNumber:1,genre:"Fantasy",tags:"heist, found family",pages:465,year:2015,rating:5,spice:0,dateStarted:thisYear("06-02"),dateFinished:thisYear("06-18"),isbn:"",shelf:"Bedroom",cover:"",notes:"Fast-paced and character driven.",added:Date.now()-150000},
+    {id:uid(),title:"Crooked Kingdom",author:"Leigh Bardugo",status:"Want to read",format:"Paperback",series:"Six of Crows",seriesNumber:2,genre:"Fantasy",tags:"heist, found family",pages:536,year:2016,rating:0,spice:0,dateStarted:"",dateFinished:"",isbn:"",shelf:"Bedroom",cover:"",notes:"",added:Date.now()-100000}
   ];
   let state = loadState();
   let activeView = "dashboard";
@@ -266,6 +274,7 @@
   function randomPick(){ const pool=state.books.filter(b=>b.status==="Want to read");if(!pool.length){toast("Add a Want to read book first");return}const b=pool[Math.floor(Math.random()*pool.length)];document.getElementById("hero-title").dataset.picked="1";document.getElementById("hero-title").textContent=`Read next: ${b.title}`;document.getElementById("hero-copy").textContent=`By ${b.author}${b.genre?` · ${b.genre}`:""}${b.pages?` · ${b.pages} pages`:""}. Not feeling it? Pick again.`;toast("Your next read is ready"); }
 
   document.addEventListener("click",e=>{
+    const etsy=e.target.closest("[data-etsy-cta]");if(etsy){if(ETSY_LISTING_URL){window.open(ETSY_LISTING_URL,"_blank","noopener,noreferrer");}else{toast("Full Shelfmark Etsy listing coming soon");}return}
     const locked=e.target.closest("[data-demo-locked]");if(locked){toast(`${locked.dataset.demoLocked} is available in the full version`);return}
     const v=e.target.closest("[data-view]");if(v){showView(v.dataset.view);return}
     const o=e.target.closest("[data-open]");if(o){openModal(o.dataset.open);return}

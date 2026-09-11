@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Shelfmark - Private Book & Reading Tracker</title>
+  <style>
+    :root{
+      --bg:#f6f3ec;--surface:#fffdf9;--surface-2:#eee9df;--ink:#20251f;--muted:#6d746c;
+      --accent:#1d6b59;--accent-2:#d9a15b;--accent-soft:#dceee8;--line:#dcd8cf;--danger:#a8493f;
+      --shadow:0 16px 42px rgba(49,44,34,.09);--radius:22px;--sidebar:250px
+    }
+    [data-theme="dark"]{
+      --bg:#111712;--surface:#192019;--surface-2:#252e26;--ink:#f3f2ea;--muted:#aeb7ad;
+      --accent:#75cbb4;--accent-2:#e0ad6f;--accent-soft:#213d34;--line:#344037;--danger:#ef9187;
+      --shadow:0 18px 46px rgba(0,0,0,.24)
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:var(--sidebar) 1fr}
+    .sidebar{position:sticky;top:0;height:100vh;padding:26px 18px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:5}
+    .brand{display:flex;align-items:center;gap:12px;padding:0 8px 25px}
+    .brand-mark{width:42px;height:42px;border-radius:13px;background:var(--accent);display:grid;place-items:center;color:white;box-shadow:var(--shadow)}
+    .brand-mark svg{width:24px;height:24px}
+    .brand strong{font-family:Georgia,serif;font-size:23px;letter-spacing:-.4px}
+    .brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+    .nav{display:grid;gap:6px}
+    .nav button{width:100%;display:flex;align-items:center;gap:12px;padding:11px 13px;border:0;border-radius:13px;background:transparent;color:var(--muted);text-align:left}
+    .nav button:hover,.nav button.active{background:var(--accent-soft);color:var(--accent);font-weight:750}
+    .nav svg{width:19px;height:19px;stroke-width:1.8}
+    .sidebar-foot{margin-top:auto;padding:18px 10px 4px;color:var(--muted);font-size:12px}
+    .privacy-note{display:flex;gap:8px;align-items:flex-start;margin-bottom:13px}
+    .privacy-dot{width:8px;height:8px;background:#42ad79;border-radius:50%;margin-top:5px;box-shadow:0 0 0 4px color-mix(in srgb,#42ad79 15%,transparent)}
+    main{min-width:0;padding:28px 32px 60px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+    .eyebrow{color:var(--accent);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+    h1,h2,h3,p{margin-top:0}
+    h1{font:700 34px/1.1 Georgia,serif;margin-bottom:7px;letter-spacing:-.7px}
+    h2{font:700 25px/1.15 Georgia,serif;letter-spacing:-.35px}
+    h3{font-size:16px;margin-bottom:7px}
+    .subtle{color:var(--muted)}
+    .top-actions,.actions,.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:750;box-shadow:0 4px 14px rgba(0,0,0,.03)}
+    .btn:hover{transform:translateY(-1px);border-color:var(--accent)}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.ghost{box-shadow:none;background:transparent}
+    .btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,var(--line))}
+    .btn.icon{width:42px;height:42px;padding:0;display:grid;place-items:center}
+    .btn.small{padding:7px 10px;font-size:13px}
+    .view{display:none}.view.active{display:block}
+    .hero{border-radius:28px;background:linear-gradient(128deg,var(--accent),#164b41);color:white;padding:30px;display:grid;grid-template-columns:1.3fr .7fr;gap:24px;overflow:hidden;position:relative;margin-bottom:22px;box-shadow:var(--shadow)}
+    .hero:after{content:"";position:absolute;width:310px;height:310px;border-radius:50%;right:-100px;top:-145px;background:rgba(255,255,255,.09)}
+    .hero h2{font-size:29px;margin:8px 0 9px}.hero p{max-width:620px;color:rgba(255,255,255,.82);margin-bottom:20px}
+    .hero .btn{border:0}.hero-art{display:flex;align-items:center;justify-content:center;gap:8px;min-height:130px;position:relative;z-index:1}
+    .book-spine{width:38px;height:135px;border-radius:5px 5px 2px 2px;background:#efd8b6;box-shadow:inset -6px 0 rgba(0,0,0,.08);transform:rotate(-3deg)}
+    .book-spine:nth-child(2){height:112px;background:#d8a05b;transform:rotate(2deg)}
+    .book-spine:nth-child(3){height:148px;background:#f2eee3;transform:rotate(0)}
+    .book-spine:nth-child(4){height:124px;background:#7eb8a9;transform:rotate(4deg)}
+    .grid{display:grid;gap:18px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:22px}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+    .stat{position:relative;overflow:hidden}.stat .label{color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.stat .value{font:700 31px/1.2 Georgia,serif;margin:5px 0}.stat .hint{color:var(--muted);font-size:12px}.stat .bubble{position:absolute;right:-12px;top:-10px;width:65px;height:65px;border-radius:50%;background:var(--accent-soft)}
+    .dash-grid{grid-template-columns:1.25fr .75fr}.section-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}.section-head h2{margin:0}
+    .book-row{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.book-row:last-child{border-bottom:0}
+    .mini-cover{width:44px;height:58px;border-radius:7px;background:linear-gradient(145deg,var(--accent),color-mix(in srgb,var(--accent) 58%,#fff));color:white;display:grid;place-items:center;font:700 17px Georgia,serif;box-shadow:3px 4px 0 var(--surface-2)}
+    .book-row strong{display:block}.book-row small{color:var(--muted)}
+    .progress-ring{--p:0;width:122px;height:122px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--surface-2) 0);display:grid;place-items:center;margin:8px auto 17px}.progress-ring:after{content:"";width:92px;height:92px;border-radius:50%;background:var(--surface);position:absolute}.progress-ring span{position:relative;z-index:1;text-align:center;font:700 25px Georgia,serif}.progress-ring small{display:block;font:600 10px Inter,sans-serif;color:var(--muted);text-transform:uppercase}
+    .quote{border-left:3px solid var(--accent-2);padding-left:14px;color:var(--muted);font-family:Georgia,serif;font-style:italic}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:17px;flex-wrap:wrap}
+    .search{position:relative;min-width:min(360px,100%);flex:1}.search input{width:100%;padding:11px 14px 11px 40px}.search svg{position:absolute;left:13px;top:12px;width:18px;color:var(--muted)}
+    input,select,textarea{border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);padding:10px 12px;outline:none}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .book-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:17px}
+    .book-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:13px;box-shadow:var(--shadow);transition:.18s ease;position:relative}.book-card:hover{transform:translateY(-3px)}
+    .cover{aspect-ratio:3/4;border-radius:12px;background:linear-gradient(145deg,var(--cover,var(--accent)),color-mix(in srgb,var(--cover,var(--accent)) 58%,#fff));color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;box-shadow:inset -9px 0 rgba(0,0,0,.09),0 8px 20px rgba(0,0,0,.08);overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.cover{position:relative}.cover-title{font:700 19px/1.15 Georgia,serif;position:relative;z-index:1}.cover-author{font-size:11px;opacity:.82;margin-top:10px;position:relative;z-index:1}
+    .book-meta{padding:12px 2px 3px}.book-meta strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.book-meta small{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stars{color:#d69b43;letter-spacing:1px;font-size:12px;margin-top:6px}.pill{display:inline-flex;align-items:center;border-radius:99px;padding:4px 8px;background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.05em;margin-top:8px}
+    .card-menu{position:absolute;right:21px;top:21px;width:32px;height:32px;border:0;border-radius:10px;background:rgba(255,255,255,.88);color:#25322d;font-weight:900;z-index:2}
+    .empty{text-align:center;padding:55px 20px;color:var(--muted)}.empty .empty-icon{width:64px;height:64px;border-radius:20px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin:0 auto 15px}.empty h3{color:var(--ink)}
+    .goal-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px}.goal-number{font:700 38px Georgia,serif;color:var(--accent)}
+    .bar{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}.bar span{height:100%;display:block;background:var(--accent);border-radius:inherit}
+    .analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-list{display:grid;gap:13px}.chart-row{display:grid;grid-template-columns:120px 1fr 35px;align-items:center;gap:10px;font-size:13px}.chart-row label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chart-row .bar{height:8px}.chart-row b{text-align:right}
+    .series-grid,.loan-grid{grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}.series-stack{display:flex;margin:15px 0 10px;height:76px;align-items:flex-end}.series-stack span{width:24px;margin-right:3px;border-radius:3px 3px 0 0;background:var(--accent);border-bottom:4px solid color-mix(in srgb,var(--accent) 70%,#000)}
+    .loan-card{display:grid;gap:8px}.loan-card.overdue{border-color:color-mix(in srgb,var(--danger) 55%,var(--line))}.loan-card .due{color:var(--muted)}.loan-card.overdue .due{color:var(--danger);font-weight:800}
+    .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.setting{display:flex;justify-content:space-between;align-items:center;gap:18px}.setting .copy{max-width:470px}.setting p{color:var(--muted);font-size:13px;margin:4px 0 0}
+    .modal{position:fixed;inset:0;background:rgba(8,14,10,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;backdrop-filter:blur(5px)}.modal.open{display:flex}.dialog{width:min(760px,100%);max-height:92vh;overflow:auto;background:var(--surface);border-radius:24px;border:1px solid var(--line);box-shadow:0 30px 100px rgba(0,0,0,.3);padding:24px}.dialog.small{width:min(520px,100%)}
+    .dialog-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:19px}.dialog-head h2{margin:0}.close{border:0;background:var(--surface-2);color:var(--ink);width:36px;height:36px;border-radius:11px;font-size:20px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.field textarea{min-height:90px;resize:vertical}.dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+    .dropzone{border:2px dashed var(--line);border-radius:18px;padding:30px;text-align:center;background:var(--bg)}.dropzone.drag{border-color:var(--accent);background:var(--accent-soft)}.dropzone input{max-width:100%}.import-result{margin-top:14px;padding:12px;border-radius:12px;background:var(--accent-soft);display:none}.import-result.show{display:block}
+    .toast{position:fixed;right:22px;bottom:22px;background:var(--ink);color:var(--surface);border-radius:13px;padding:12px 16px;font-weight:750;transform:translateY(120px);transition:.25s;z-index:40;box-shadow:var(--shadow)}.toast.show{transform:translateY(0)}
+    .mobile-head{display:none}.footnote{margin-top:28px;color:var(--muted);font-size:11px;text-align:center}
+    @media(max-width:980px){.stats{grid-template-columns:repeat(2,1fr)}.dash-grid,.analytics-grid,.settings-grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-art{display:none}}
+    @media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;padding:8px 10px;border-right:0;border-top:1px solid var(--line)}.brand,.sidebar-foot{display:none}.nav{display:flex;overflow-x:auto;gap:4px}.nav button{min-width:72px;justify-content:center;flex-direction:column;gap:2px;padding:7px;font-size:10px}.nav svg{width:18px;height:18px}main{padding:20px 16px 100px}.mobile-head{display:block}.topbar{align-items:flex-start}h1{font-size:29px}.top-actions .btn:not(.primary),.top-actions .btn.icon{display:none}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:16px}.hero{padding:22px}.hero h2{font-size:25px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-card{padding:9px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.dialog{padding:18px}.goal-card{grid-template-columns:1fr;text-align:center}.chart-row{grid-template-columns:90px 1fr 28px}}
+    @media(max-width:420px){.stats{grid-template-columns:1fr}.book-grid{grid-template-columns:1fr 1fr}.book-meta small{font-size:11px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><path d="M8 7h8M8 10h6"/></svg></div>
+      <div><strong>Shelfmark</strong><small>by KeptApps</small></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <div class="privacy-note"><span class="privacy-dot"></span><span>Your library stays on this device.</span></div>
+      <span id="save-status">Saved locally</span>
+    </div>
+  </aside>
+  <main>
+    <div class="mobile-head eyebrow">Shelfmark by KeptApps</div>
+    <header class="topbar">
+      <div><div class="eyebrow" id="eyebrow">Your private library</div><h1 id="page-title">Dashboard</h1><div class="subtle" id="page-subtitle">Everything you are reading, at a glance.</div></div>
+      <div class="top-actions"><button class="btn icon" id="theme-btn" title="Toggle theme">◐</button><button class="btn" data-open="import-modal">Import CSV</button><button class="btn primary" data-open="book-modal">+ Add book</button></div>
+    </header>
+
+    <section class="view active" id="dashboard-view">
+      <div class="hero">
+        <div><div class="eyebrow" style="color:#b8eadb">Your next chapter</div><h2 id="hero-title">Build a library you can actually use.</h2><p id="hero-copy">Import from Goodreads or StoryGraph, track every series, and always know what to read next.</p><div class="actions"><button class="btn" id="pick-btn">Pick my next read</button><button class="btn ghost" style="color:white;border-color:rgba(255,255,255,.35)" data-open="import-modal">Import my books</button></div></div>
+        <div class="hero-art" aria-hidden="true"><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span></div>
+      </div>
+      <div class="grid stats" id="stats"></div>
+      <div class="grid dash-grid">
+        <div class="card"><div class="section-head"><h2>Currently reading</h2><button class="btn small ghost" data-view="library">View library</button></div><div id="current-list"></div></div>
+        <div class="card"><div class="section-head"><h2>Reading goal</h2><button class="btn small ghost" data-view="goals">Edit goal</button></div><div id="goal-mini"></div></div>
+      </div>
+    </section>
+
+    <section class="view" id="library-view">
+      <div class="toolbar"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="search-input" placeholder="Search title, author, series, genre or tag"></div><div class="filters"><select id="status-filter"><option value="">All statuses</option><option>Want to read</option><option>Reading</option><option>Finished</option><option>Did not finish</option></select><select id="sort-select"><option value="added-desc">Newest added</option><option value="title-asc">Title A-Z</option><option value="author-asc">Author A-Z</option><option value="rating-desc">Highest rated</option><option value="year-desc">Newest published</option></select></div></div>
+      <div class="grid book-grid" id="book-grid"></div>
+    </section>
+
+    <section class="view" id="series-view"><div class="grid series-grid" id="series-grid"></div></section>
+
+    <section class="view" id="goals-view">
+      <div class="card goal-card"><div class="goal-number" id="goal-progress-num">0</div><div><h2 id="goal-heading">Your reading goal</h2><p class="subtle" id="goal-copy"></p><div class="bar"><span id="goal-bar"></span></div></div><button class="btn" data-open="goal-modal">Set goal</button></div>
+      <div class="grid stats" id="goal-stats" style="margin-top:18px"></div>
+      <div class="card"><div class="section-head"><h2>Finished this year</h2></div><div id="finished-list"></div></div>
+    </section>
+
+    <section class="view" id="loans-view"><div class="section-head"><div><h2>Books out on loan</h2><p class="subtle">Keep track of who borrowed what.</p></div><button class="btn primary" data-open="loan-modal">+ Record loan</button></div><div class="grid loan-grid" id="loan-grid"></div></section>
+
+    <section class="view" id="analytics-view"><div class="grid analytics-grid"><div class="card"><div class="section-head"><h2>By status</h2></div><div class="chart-list" id="status-chart"></div></div><div class="card"><div class="section-head"><h2>Top genres</h2></div><div class="chart-list" id="genre-chart"></div></div><div class="card"><div class="section-head"><h2>By format</h2></div><div class="chart-list" id="format-chart"></div></div><div class="card"><div class="section-head"><h2>Ratings</h2></div><div class="chart-list" id="rating-chart"></div></div></div></section>
+
+    <section class="view" id="settings-view">
+      <div class="grid settings-grid">
+        <div class="card setting"><div class="copy"><h3>Back up everything</h3><p>Download one file containing your complete library, settings and loans.</p></div><button class="btn" id="backup-btn">Back up</button></div>
+        <div class="card setting"><div class="copy"><h3>Restore a backup</h3><p>Move Shelfmark to a new device or restore an earlier copy.</p></div><button class="btn" id="restore-btn">Restore</button><input id="restore-input" type="file" accept="application/json" hidden></div>
+        <div class="card setting"><div class="copy"><h3>Export a spreadsheet</h3><p>Download your full library as a clean CSV file whenever you want.</p></div><button class="btn" id="export-btn">Export CSV</button></div>
+        <div class="card setting"><div class="copy"><h3>Sample library</h3><p>Load a small sample to explore every screen. This will replace current data.</p></div><button class="btn" id="sample-btn">Load sample</button></div>
+        <div class="card setting"><div class="copy"><h3>Accent colour</h3><p>Choose the colour used throughout Shelfmark.</p></div><select id="accent-select"><option value="#1d6b59">Evergreen</option><option value="#7a4d8e">Mulberry</option><option value="#2e6287">Ink blue</option><option value="#a85642">Terracotta</option></select></div>
+        <div class="card setting"><div class="copy"><h3>Clear all data</h3><p>Erase this local library from this browser. Download a backup first.</p></div><button class="btn danger" id="clear-btn">Clear</button></div>
+      </div>
+      <div class="footnote">Shelfmark stores data in this browser on this device. It does not create an account or upload your library.</div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="book-modal"><div class="dialog"><div class="dialog-head"><div><div class="eyebrow">Library entry</div><h2 id="book-modal-title">Add a book</h2></div><button class="close" data-close>×</button></div><form id="book-form"><input type="hidden" name="id"><div class="form-grid">
+  <div class="field"><label>Title *</label><input name="title" required></div><div class="field"><label>Author *</label><input name="author" required></div>
+  <div class="field"><label>Status</label><select name="status"><option>Want to read</option><option>Reading</option><option>Finished</option><option>Did not finish</option></select></div><div class="field"><label>Format</label><select name="format"><option>Paperback</option><option>Hardcover</option><option>Ebook</option><option>Audiobook</option><option>Other</option></select></div>
+  <div class="field"><label>Series</label><input name="series" placeholder="Leave blank for standalone"></div><div class="field"><label>Series number</label><input name="seriesNumber" type="number" min="0" step="0.5"></div>
+  <div class="field"><label>Genre</label><input name="genre" placeholder="Fantasy, Mystery..."></div><div class="field"><label>Tags / tropes</label><input name="tags" placeholder="cosy, found family, first edition"></div>
+  <div class="field"><label>Pages</label><input name="pages" type="number" min="0"></div><div class="field"><label>Year published</label><input name="year" type="number" min="0"></div>
+  <div class="field"><label>Rating</label><select name="rating"><option value="0">Not rated</option><option value="1">1 star</option><option value="2">2 stars</option><option value="3">3 stars</option><option value="4">4 stars</option><option value="5">5 stars</option></select></div><div class="field"><label>Spice level</label><select name="spice"><option value="0">Not set</option><option value="1">1 - Closed door</option><option value="2">2 - Mild</option><option value="3">3 - Medium</option><option value="4">4 - Spicy</option><option value="5">5 - Very spicy</option></select></div>
+  <div class="field"><label>Date started</label><input name="dateStarted" type="date"></div><div class="field"><label>Date finished</label><input name="dateFinished" type="date"></div>
+  <div class="field"><label>ISBN</label><input name="isbn"></div><div class="field"><label>Shelf location</label><input name="shelf" placeholder="Living room, Shelf B..."></div>
+  <div class="field full"><label>Cover image URL (optional)</label><input name="cover" type="url" placeholder="https://..."></div><div class="field full"><label>Notes or review</label><textarea name="notes"></textarea></div>
+</div><div class="dialog-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn danger" id="delete-book" hidden>Delete</button><button class="btn primary">Save book</button></div></form></div></div>
+
+<div class="modal" id="import-modal"><div class="dialog small"><div class="dialog-head"><div><div class="eyebrow">Bring your library</div><h2>Import a CSV</h2></div><button class="close" data-close>×</button></div><p class="subtle">Works with Goodreads exports, StoryGraph exports, and ordinary spreadsheets containing at least Title and Author columns.</p><div class="dropzone" id="dropzone"><h3>Choose or drop a CSV file</h3><p class="subtle">Nothing is uploaded. The file is read only in this browser.</p><input type="file" id="csv-input" accept=".csv,text/csv"></div><div class="import-result" id="import-result"></div><div class="dialog-actions"><button class="btn" data-close>Close</button></div></div></div>
+
+<div class="modal" id="goal-modal"><div class="dialog small"><div class="dialog-head"><div><div class="eyebrow">Reading challenge</div><h2>Set your yearly goal</h2></div><button class="close" data-close>×</button></div><form id="goal-form"><div class="field"><label>Books to finish this year</label><input name="goal" type="number" min="1" max="999" required></div><div class="dialog-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn primary">Save goal</button></div></form></div></div>
+
+<div class="modal" id="loan-modal"><div class="dialog small"><div class="dialog-head"><div><div class="eyebrow">Loan tracker</div><h2>Record a loan</h2></div><button class="close" data-close>×</button></div><form id="loan-form"><div class="form-grid"><div class="field full"><label>Book</label><select name="bookId" required></select></div><div class="field"><label>Borrower</label><input name="borrower" required></div><div class="field"><label>Due date</label><input name="due" type="date"></div></div><div class="dialog-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn primary">Save loan</button></div></form></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  "use strict";
+  const STORAGE_KEY = "keptapps-shelfmark-v1";
+  const navItems = [
+    ["dashboard","Dashboard","⌂"],["library","Library","▤"],["series","Series","▥"],["goals","Goals","◎"],["loans","Loans","↗"],["analytics","Analytics","◫"],["settings","Settings","⚙"]
+  ];
+  const pageInfo = {
+    dashboard:["Your private library","Dashboard","Everything you are reading, at a glance."],
+    library:["Every book, one place","My library","Search, filter and manage your whole collection."],
+    series:["Never lose your place","Series tracker","See every series together and spot what comes next."],
+    goals:["A goal that grows with you","Reading goals","Track finished books, pages and progress this year."],
+    loans:["No more missing books","Loan tracker","Remember who borrowed each book and when it is due."],
+    analytics:["Your reading, made visible","Analytics","Discover the genres, formats and ratings behind your library."],
+    settings:["Your file, your data","Settings & backup","Back up, restore, export and personalize Shelfmark."]
+  };
+  const sampleBooks = () => [
+    {id:uid(),title:"The Midnight Library",author:"Matt Haig",status:"Finished",format:"Paperback",series:"",seriesNumber:"",genre:"Contemporary",tags:"magical realism, reflective",pages:304,year:2020,rating:4,spice:0,dateStarted:thisYear("01-12"),dateFinished:thisYear("01-19"),isbn:"",shelf:"Living room",cover:"",notes:"A thoughtful read about choices.",added:Date.now()-900000},
+    {id:uid(),title:"A Court of Thorns and Roses",author:"Sarah J. Maas",status:"Reading",format:"Hardcover",series:"A Court of Thorns and Roses",seriesNumber:1,genre:"Fantasy Romance",tags:"fae, enemies to lovers",pages:432,year:2015,rating:0,spice:3,dateStarted:thisYear("02-03"),dateFinished:"",isbn:"",shelf:"Bedroom",cover:"",notes:"",added:Date.now()-800000},
+    {id:uid(),title:"A Court of Mist and Fury",author:"Sarah J. Maas",status:"Want to read",format:"Paperback",series:"A Court of Thorns and Roses",seriesNumber:2,genre:"Fantasy Romance",tags:"fae, found family",pages:624,year:2016,rating:0,spice:4,dateStarted:"",dateFinished:"",isbn:"",shelf:"Bedroom",cover:"",notes:"",added:Date.now()-700000},
+    {id:uid(),title:"The Thursday Murder Club",author:"Richard Osman",status:"Finished",format:"Ebook",series:"Thursday Murder Club",seriesNumber:1,genre:"Mystery",tags:"cosy mystery, found family",pages:400,year:2020,rating:5,spice:0,dateStarted:thisYear("03-05"),dateFinished:thisYear("03-15"),isbn:"",shelf:"Digital",cover:"",notes:"Warm, clever and genuinely funny.",added:Date.now()-600000},
+    {id:uid(),title:"The Man Who Died Twice",author:"Richard Osman",status:"Want to read",format:"Paperback",series:"Thursday Murder Club",seriesNumber:2,genre:"Mystery",tags:"cosy mystery",pages:422,year:2021,rating:0,spice:0,dateStarted:"",dateFinished:"",isbn:"",shelf:"Hall bookcase",cover:"",notes:"",added:Date.now()-500000},
+    {id:uid(),title:"Project Hail Mary",author:"Andy Weir",status:"Finished",format:"Audiobook",series:"",seriesNumber:"",genre:"Science Fiction",tags:"space, survival",pages:496,year:2021,rating:5,spice:0,dateStarted:thisYear("04-02"),dateFinished:thisYear("04-17"),isbn:"",shelf:"Audio",cover:"",notes:"Smart, tense and full of heart.",added:Date.now()-400000},
+    {id:uid(),title:"Tomorrow, and Tomorrow, and Tomorrow",author:"Gabrielle Zevin",status:"Reading",format:"Hardcover",series:"",seriesNumber:"",genre:"Literary Fiction",tags:"friendship, games",pages:416,year:2022,rating:0,spice:0,dateStarted:thisYear("05-09"),dateFinished:"",isbn:"",shelf:"Desk",cover:"",notes:"",added:Date.now()-300000},
+    {id:uid(),title:"The Very Secret Society of Irregular Witches",author:"Sangu Mandanna",status:"Want to read",format:"Paperback",series:"",seriesNumber:"",genre:"Fantasy",tags:"cosy, found family, witches",pages:336,year:2022,rating:0,spice:2,dateStarted:"",dateFinished:"",isbn:"",shelf:"Living room",cover:"",notes:"",added:Date.now()-200000}
+  ];
+  let state = loadState();
+  let activeView = "dashboard";
+
+  function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+  function thisYear(md){ return `${new Date().getFullYear()}-${md}`; }
+  function defaults(){ return {books:[],loans:[],goal:24,theme:"light",accent:"#1d6b59"}; }
+  function loadState(){ try{ const raw=localStorage.getItem(STORAGE_KEY); return raw?{...defaults(),...JSON.parse(raw)}:defaults(); }catch(e){ return defaults(); } }
+  function saveState(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); document.getElementById("save-status").textContent=`Saved ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`; }
+  function esc(v=""){ return String(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+  function slugLetters(title){ return title.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase(); }
+  function coverColor(book){ const colors=["#1d6b59","#7a4d8e","#2e6287","#a85642","#8b6c43","#59694d"]; let n=[...book.title].reduce((a,c)=>a+c.charCodeAt(0),0); return colors[n%colors.length]; }
+  function fmtDate(v){ if(!v)return "No date"; const d=new Date(v+"T12:00:00"); return isNaN(d)?v:d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}); }
+  function finishedThisYear(){ const y=String(new Date().getFullYear()); return state.books.filter(b=>b.status==="Finished"&&(b.dateFinished||"").startsWith(y)); }
+  function daysBetween(a,b){ if(!a||!b)return null; return Math.max(1,Math.round((new Date(b)-new Date(a))/86400000)); }
+  function toast(msg){ const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600); }
+  function iconSvg(symbol){ return `<span aria-hidden="true" style="font-size:18px;width:20px;text-align:center">${symbol}</span>`; }
+  function buildNav(){ document.getElementById("nav").innerHTML=navItems.map(([id,label,icon])=>`<button data-view="${id}" class="${id===activeView?'active':''}">${iconSvg(icon)}<span>${label}</span></button>`).join(""); }
+  function showView(id){ activeView=id;document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===`${id}-view`));buildNav();const [e,t,s]=pageInfo[id];document.getElementById("eyebrow").textContent=e;document.getElementById("page-title").textContent=t;document.getElementById("page-subtitle").textContent=s;render();window.scrollTo({top:0,behavior:"smooth"}); }
+  function render(){ applyTheme();renderDashboard();renderLibrary();renderSeries();renderGoals();renderLoans();renderAnalytics();renderLoanOptions(); }
+  function applyTheme(){ document.documentElement.dataset.theme=state.theme;document.documentElement.style.setProperty("--accent",state.accent);document.getElementById("accent-select").value=state.accent; }
+  function renderDashboard(){
+    const finished=finishedThisYear(),current=state.books.filter(b=>b.status==="Reading"),tbr=state.books.filter(b=>b.status==="Want to read"),pages=finished.reduce((n,b)=>n+(+b.pages||0),0);
+    document.getElementById("stats").innerHTML=[
+      [state.books.length,"Books owned","Across every shelf"],[current.length,"Reading now","Books in progress"],[finished.length,"Finished this year",`${pages.toLocaleString()} pages`],[tbr.length,"Want to read","Waiting for you"]
+    ].map(([v,l,h])=>`<div class="card stat"><span class="bubble"></span><div class="label">${l}</div><div class="value">${v}</div><div class="hint">${h}</div></div>`).join("");
+    document.getElementById("current-list").innerHTML=current.length?current.slice(0,5).map(bookRow).join(""):emptyState("No books in progress","Mark a book as Reading to see it here.");
+    const pct=Math.min(100,Math.round(finished.length/Math.max(1,state.goal)*100));
+    document.getElementById("goal-mini").innerHTML=`<div class="progress-ring" style="--p:${pct}"><span>${pct}%<small>${finished.length} of ${state.goal}</small></span></div><p class="quote">${finished.length>=state.goal?"Goal complete. Everything else is a bonus.":`${Math.max(0,state.goal-finished.length)} books to go. One page at a time.`}</p>`;
+    if(state.books.length){document.getElementById("hero-title").textContent=`${state.books.length} books. One beautifully organised library.`;document.getElementById("hero-copy").textContent=current.length?`You have ${current.length} book${current.length===1?"":"s"} in progress and ${tbr.length} waiting on your TBR.`:"Your shelves are organised. Choose something from your TBR when you are ready.";}
+  }
+  function bookRow(b){ return `<div class="book-row"><div class="mini-cover" style="background:${coverColor(b)}">${esc(slugLetters(b.title))}</div><div><strong>${esc(b.title)}</strong><small>${esc(b.author)}${b.pages?` · ${b.pages} pages`:""}</small></div><span class="pill">${esc(b.status)}</span></div>`; }
+  function emptyState(title,copy){ return `<div class="empty"><div class="empty-icon">⌑</div><h3>${title}</h3><p>${copy}</p></div>`; }
+  function filteredBooks(){ const q=document.getElementById("search-input").value.trim().toLowerCase(),status=document.getElementById("status-filter").value,sort=document.getElementById("sort-select").value;let arr=state.books.filter(b=>(!status||b.status===status)&&(!q||[b.title,b.author,b.series,b.genre,b.tags,b.isbn,b.shelf].join(" ").toLowerCase().includes(q)));arr.sort((a,b)=>{if(sort==="title-asc")return a.title.localeCompare(b.title);if(sort==="author-asc")return a.author.localeCompare(b.author);if(sort==="rating-desc")return (+b.rating||0)-(+a.rating||0);if(sort==="year-desc")return (+b.year||0)-(+a.year||0);return (+b.added||0)-(+a.added||0)});return arr; }
+  function renderLibrary(){ const arr=filteredBooks();document.getElementById("book-grid").innerHTML=arr.length?arr.map(b=>`<article class="book-card"><button class="card-menu" data-edit="${b.id}" title="Edit book">•••</button><div class="cover" style="--cover:${coverColor(b)}">${b.cover?`<img src="${esc(b.cover)}" alt="" onerror="this.remove()">`:""}<div class="cover-title">${esc(b.title)}</div><div class="cover-author">${esc(b.author)}</div></div><div class="book-meta"><strong title="${esc(b.title)}">${esc(b.title)}</strong><small>${esc(b.author)}${b.series?` · ${esc(b.series)} #${esc(b.seriesNumber||"?")}`:""}</small><div class="stars">${b.rating?"★".repeat(+b.rating)+"☆".repeat(5-(+b.rating)):"Not rated"}</div><span class="pill">${esc(b.status)}</span></div></article>`).join(""):emptyState("No books found",state.books.length?"Try a different search or filter.":"Add your first book or import a CSV to begin."); }
+  function renderSeries(){ const grouped={};state.books.filter(b=>b.series).forEach(b=>(grouped[b.series]??=[]).push(b));const entries=Object.entries(grouped).sort(([a],[b])=>a.localeCompare(b));document.getElementById("series-grid").innerHTML=entries.length?entries.map(([name,books])=>{books.sort((a,b)=>(+a.seriesNumber||999)-(+b.seriesNumber||999));const done=books.filter(b=>b.status==="Finished").length;return `<div class="card"><div class="eyebrow">${done} of ${books.length} finished</div><h2>${esc(name)}</h2><p class="subtle">${esc(books[0].author)}</p><div class="series-stack">${books.map((b,i)=>`<span title="#${esc(b.seriesNumber||i+1)} ${esc(b.title)}" style="height:${42+(i%3)*12}px;opacity:${b.status==='Finished'?1:.38}"></span>`).join("")}</div>${books.map(b=>`<div class="book-row" style="grid-template-columns:28px 1fr auto"><b>#${esc(b.seriesNumber||"?")}</b><div><strong>${esc(b.title)}</strong><small>${esc(b.status)}</small></div>${b.rating?`<span class="stars">${"★".repeat(+b.rating)}</span>`:""}</div>`).join("")}</div>`}).join(""):emptyState("No series yet","Add a series name and number to any book to track it here."); }
+  function renderGoals(){ const list=finishedThisYear(),pages=list.reduce((n,b)=>n+(+b.pages||0),0),days=list.map(b=>daysBetween(b.dateStarted,b.dateFinished)).filter(Boolean),avg=days.length?Math.round(days.reduce((a,b)=>a+b,0)/days.length):0,pct=Math.min(100,Math.round(list.length/Math.max(1,state.goal)*100));document.getElementById("goal-progress-num").textContent=`${pct}%`;document.getElementById("goal-heading").textContent=`${list.length} of ${state.goal} books finished`;document.getElementById("goal-copy").textContent=list.length>=state.goal?"You completed your goal. Keep reading anything that makes you curious.":`${Math.max(0,state.goal-list.length)} books left in ${new Date().getFullYear()}.`;document.getElementById("goal-bar").style.width=`${pct}%`;document.getElementById("goal-stats").innerHTML=[[pages.toLocaleString(),"Pages read","This year"],[list.length?Math.round(pages/list.length):0,"Average length","Pages per book"],[avg||0,"Average finish","Days per book"],[list.filter(b=>+b.rating===5).length,"Five-star reads","New favourites"]].map(([v,l,h])=>`<div class="card stat"><div class="label">${l}</div><div class="value">${v}</div><div class="hint">${h}</div></div>`).join("");document.getElementById("finished-list").innerHTML=list.length?list.sort((a,b)=>(b.dateFinished||"").localeCompare(a.dateFinished||"")).map(bookRow).join(""):emptyState("Nothing finished yet","Finished books with a date from this year appear here.");document.querySelector('#goal-form [name="goal"]').value=state.goal; }
+  function renderLoans(){ const now=new Date();now.setHours(0,0,0,0);const active=state.loans.filter(l=>!l.returned);document.getElementById("loan-grid").innerHTML=active.length?active.map(l=>{const b=state.books.find(x=>x.id===l.bookId),over=l.due&&new Date(l.due+"T12:00:00")<now;return `<div class="card loan-card ${over?'overdue':''}"><div class="eyebrow">${over?'Overdue':'On loan'}</div><h2>${esc(b?.title||"Unknown book")}</h2><p>Borrowed by <strong>${esc(l.borrower)}</strong></p><div class="due">${l.due?`Due ${fmtDate(l.due)}`:"No due date"}</div><button class="btn small" data-return="${l.id}">Mark returned</button></div>`}).join(""):emptyState("Nothing is out on loan","Record a loan the next time a book leaves your shelf."); }
+  function countBy(field,filter=()=>true){ return state.books.filter(filter).reduce((a,b)=>{const key=b[field]||"Not set";a[key]=(a[key]||0)+1;return a;},{}); }
+  function chart(data){ const entries=Object.entries(data).sort((a,b)=>b[1]-a[1]).slice(0,8),max=Math.max(1,...entries.map(x=>x[1]));return entries.length?entries.map(([k,v])=>`<div class="chart-row"><label title="${esc(k)}">${esc(k)}</label><div class="bar"><span style="width:${v/max*100}%"></span></div><b>${v}</b></div>`).join(""):`<p class="subtle">Add books to see this chart.</p>`; }
+  function renderAnalytics(){ document.getElementById("status-chart").innerHTML=chart(countBy("status"));document.getElementById("genre-chart").innerHTML=chart(countBy("genre"));document.getElementById("format-chart").innerHTML=chart(countBy("format"));const ratings={};state.books.filter(b=>+b.rating).forEach(b=>ratings[`${b.rating} stars`]=(ratings[`${b.rating} stars`]||0)+1);document.getElementById("rating-chart").innerHTML=chart(ratings); }
+  function renderLoanOptions(){ document.querySelector('#loan-form [name="bookId"]').innerHTML=state.books.map(b=>`<option value="${b.id}">${esc(b.title)} - ${esc(b.author)}</option>`).join(""); }
+  function openModal(id){ document.getElementById(id).classList.add("open");if(id==="book-modal"&&!document.querySelector('#book-form [name="id"]').value)resetBookForm(); }
+  function closeModals(){ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("open")); }
+  function resetBookForm(){ const f=document.getElementById("book-form");f.reset();f.elements.id.value="";document.getElementById("book-modal-title").textContent="Add a book";document.getElementById("delete-book").hidden=true; }
+  function editBook(id){ const b=state.books.find(x=>x.id===id);if(!b)return;const f=document.getElementById("book-form");Object.entries(b).forEach(([k,v])=>{if(f.elements[k])f.elements[k].value=v??""});document.getElementById("book-modal-title").textContent="Edit book";document.getElementById("delete-book").hidden=false;openModal("book-modal"); }
+  function formObject(form){ return Object.fromEntries(new FormData(form).entries()); }
+  function normalStatus(v=""){ const s=v.toLowerCase().trim();if(s.includes("dnf")||s.includes("did not")||s.includes("did-not"))return "Did not finish";if(s.includes("currently")||s==="reading"||s==="in progress")return "Reading";if(s.includes("want")||s.includes("to-read")||s==="tbr")return "Want to read";if(s==="read"||s.includes("finished")||s.includes("complete"))return "Finished";return "Want to read"; }
+  function parseCSV(text){ const rows=[];let row=[],field="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&quoted&&n==='"'){field+='"';i++;}else if(c==='"'){quoted=!quoted;}else if(c===','&&!quoted){row.push(field);field="";}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(field);field="";if(row.some(x=>x.trim()))rows.push(row);row=[];}else field+=c;}row.push(field);if(row.some(x=>x.trim()))rows.push(row);return rows; }
+  function importCSV(text){ const rows=parseCSV(text);if(rows.length<2)throw new Error("The CSV does not contain any book rows.");const headers=rows[0].map(h=>h.trim().toLowerCase().replace(/^\ufeff/,""));const find=(obj,aliases)=>{for(const a of aliases){const i=headers.indexOf(a);if(i>=0&&obj[i]!==undefined)return obj[i].trim()}return ""};let added=0,skipped=0;for(const r of rows.slice(1)){const title=find(r,["title","book title"]),author=find(r,["author","authors","author l-f"]);if(!title){skipped++;continue}const isbn=find(r,["isbn13","isbn","isbn/uid"]).replace(/^=+/,"").replace(/[\"']/g,"").trim(),rating=parseFloat(find(r,["my rating","star rating","rating"]))||0,pages=parseInt(find(r,["number of pages","pages"]))||0,status=normalStatus(find(r,["exclusive shelf","read status","status"])),dateRead=find(r,["date read","dates read","date finished"]),dateAdded=find(r,["date added","added"]),tags=find(r,["bookshelves","tags","genre","genres"]),format=find(r,["binding","format"])||"Other";const dupe=state.books.some(b=>(isbn&&b.isbn===isbn)||b.title.toLowerCase()===title.toLowerCase()&&b.author.toLowerCase()===(author||"Unknown author").toLowerCase());if(dupe){skipped++;continue}state.books.push({id:uid(),title,author:author||"Unknown author",status,format,series:"",seriesNumber:"",genre:tags.split(",")[0]||"",tags,pages,year:parseInt(find(r,["year published","original publication year","publication year"]))||"",rating:Math.min(5,Math.round(rating)),spice:0,dateStarted:"",dateFinished:toISODate(dateRead),isbn,shelf:"",cover:"",notes:find(r,["my review","review","private notes","notes"]),added:dateAdded?new Date(dateAdded).getTime()||Date.now():Date.now()});added++;}saveState();render();return {added,skipped}; }
+  function toISODate(v){ if(!v)return "";const first=v.split(/[,;]/)[0].trim(),d=new Date(first);if(isNaN(d))return "";return d.toISOString().slice(0,10); }
+  function download(name,content,type){ const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }
+  function csvCell(v){ const s=String(v??"");return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }
+  function exportCSV(){ const keys=["Title","Author","Status","Format","Series","Series Number","Genre","Tags","Pages","Year","Rating","Spice","Date Started","Date Finished","ISBN","Shelf","Notes"];const props=["title","author","status","format","series","seriesNumber","genre","tags","pages","year","rating","spice","dateStarted","dateFinished","isbn","shelf","notes"];const lines=[keys.join(","),...state.books.map(b=>props.map(k=>csvCell(b[k])).join(","))];download("Shelfmark-Library.csv",lines.join("\n"),"text/csv;charset=utf-8");toast("Library exported"); }
+  function randomPick(){ const pool=state.books.filter(b=>b.status==="Want to read");if(!pool.length){toast("Add a Want to read book first");return}const b=pool[Math.floor(Math.random()*pool.length)];document.getElementById("hero-title").textContent=`Read next: ${b.title}`;document.getElementById("hero-copy").textContent=`By ${b.author}${b.genre?` · ${b.genre}`:""}${b.pages?` · ${b.pages} pages`:""}. Not feeling it? Pick again.`;toast("Your next read is ready"); }
+
+  document.addEventListener("click",e=>{
+    const v=e.target.closest("[data-view]");if(v){showView(v.dataset.view);return}
+    const o=e.target.closest("[data-open]");if(o){openModal(o.dataset.open);return}
+    if(e.target.closest("[data-close]")||e.target.classList.contains("modal")){closeModals();return}
+    const ed=e.target.closest("[data-edit]");if(ed){editBook(ed.dataset.edit);return}
+    const ret=e.target.closest("[data-return]");if(ret){const l=state.loans.find(x=>x.id===ret.dataset.return);if(l){l.returned=Date.now();saveState();renderLoans();toast("Book marked returned")}return}
+  });
+  document.getElementById("book-form").addEventListener("submit",e=>{e.preventDefault();const d=formObject(e.currentTarget),existing=state.books.find(b=>b.id===d.id);d.id=d.id||uid();d.pages=+d.pages||0;d.year=+d.year||"";d.rating=+d.rating||0;d.spice=+d.spice||0;d.added=existing?.added||Date.now();if(existing)Object.assign(existing,d);else state.books.push(d);saveState();closeModals();resetBookForm();render();toast(existing?"Book updated":"Book added");});
+  document.getElementById("delete-book").addEventListener("click",()=>{const id=document.querySelector('#book-form [name="id"]').value;if(!id||!confirm("Delete this book from Shelfmark?"))return;state.books=state.books.filter(b=>b.id!==id);state.loans=state.loans.filter(l=>l.bookId!==id);saveState();closeModals();resetBookForm();render();toast("Book deleted");});
+  document.getElementById("goal-form").addEventListener("submit",e=>{e.preventDefault();state.goal=Math.max(1,+new FormData(e.currentTarget).get("goal")||1);saveState();closeModals();renderGoals();toast("Reading goal updated");});
+  document.getElementById("loan-form").addEventListener("submit",e=>{e.preventDefault();const d=formObject(e.currentTarget);state.loans.push({id:uid(),...d,created:Date.now(),returned:null});saveState();e.currentTarget.reset();closeModals();renderLoans();toast("Loan recorded");});
+  ["search-input","status-filter","sort-select"].forEach(id=>document.getElementById(id).addEventListener(id==="search-input"?"input":"change",renderLibrary));
+  document.getElementById("theme-btn").addEventListener("click",()=>{state.theme=state.theme==="dark"?"light":"dark";saveState();applyTheme();});
+  document.getElementById("pick-btn").addEventListener("click",randomPick);
+  document.getElementById("backup-btn").addEventListener("click",()=>{download(`Shelfmark-Backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({...state,backupVersion:1,createdAt:new Date().toISOString()},null,2),"application/json");toast("Backup downloaded");});
+  document.getElementById("restore-btn").addEventListener("click",()=>document.getElementById("restore-input").click());
+  document.getElementById("restore-input").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.books))throw new Error();if(!confirm(`Restore ${data.books.length} books? This replaces the library currently on this device.`))return;state={...defaults(),...data};saveState();render();toast("Backup restored")}catch(err){toast("That backup file could not be read")}e.target.value="";});
+  document.getElementById("export-btn").addEventListener("click",exportCSV);
+  document.getElementById("sample-btn").addEventListener("click",()=>{if(state.books.length&&!confirm("Replace the current library with sample books?"))return;state.books=sampleBooks();state.loans=[];state.goal=24;saveState();render();showView("dashboard");toast("Sample library loaded");});
+  document.getElementById("accent-select").addEventListener("change",e=>{state.accent=e.target.value;saveState();applyTheme();});
+  document.getElementById("clear-btn").addEventListener("click",()=>{if(!confirm("Clear every book, loan and setting from this browser? This cannot be undone without a backup."))return;state=defaults();saveState();render();showView("dashboard");toast("Local data cleared");});
+  const csvInput=document.getElementById("csv-input"),result=document.getElementById("import-result"),drop=document.getElementById("dropzone");
+  async function handleCSV(file){if(!file)return;try{const r=importCSV(await file.text());result.className="import-result show";result.innerHTML=`<strong>${r.added} books imported.</strong><br>${r.skipped} duplicate or incomplete rows skipped.`;toast(`${r.added} books imported`)}catch(err){result.className="import-result show";result.innerHTML=`<strong>Could not import this file.</strong><br>${esc(err.message)}`;}}
+  csvInput.addEventListener("change",e=>handleCSV(e.target.files[0]));["dragenter","dragover"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>handleCSV(e.dataTransfer.files[0]));
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModals()});
+  buildNav();render();
+})();
+</script>
+</body>
+</html>

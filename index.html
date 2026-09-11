@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Shelfmark - Private Book & Reading Tracker</title>
+  <title>Shelfmark Live Demo - Private Book & Reading Tracker</title>
   <style>
     :root{
       --bg:#f6f3ec;--surface:#fffdf9;--surface-2:#eee9df;--ink:#20251f;--muted:#6d746c;
@@ -92,12 +92,18 @@
     .dropzone{border:2px dashed var(--line);border-radius:18px;padding:30px;text-align:center;background:var(--bg)}.dropzone.drag{border-color:var(--accent);background:var(--accent-soft)}.dropzone input{max-width:100%}.import-result{margin-top:14px;padding:12px;border-radius:12px;background:var(--accent-soft);display:none}.import-result.show{display:block}
     .toast{position:fixed;right:22px;bottom:22px;background:var(--ink);color:var(--surface);border-radius:13px;padding:12px 16px;font-weight:750;transform:translateY(120px);transition:.25s;z-index:40;box-shadow:var(--shadow)}.toast.show{transform:translateY(0)}
     .mobile-head{display:none}.footnote{margin-top:28px;color:var(--muted);font-size:11px;text-align:center}
+    .demo-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;padding:11px 14px;border:1px solid color-mix(in srgb,var(--accent) 25%,var(--line));background:var(--accent-soft);color:var(--accent);border-radius:14px;font-size:12px;font-weight:800}
+    .demo-banner span{font-weight:650;color:var(--muted)}
+    .demo-badge{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}.demo-badge:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+    .btn.demo-locked{opacity:.58;cursor:not-allowed;box-shadow:none}.btn.demo-locked:hover{transform:none;border-color:var(--line)}
+    .demo-lock-note{font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-top:6px}
     @media(max-width:980px){.stats{grid-template-columns:repeat(2,1fr)}.dash-grid,.analytics-grid,.settings-grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.hero-art{display:none}}
-    @media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;padding:8px 10px;border-right:0;border-top:1px solid var(--line)}.brand,.sidebar-foot{display:none}.nav{display:flex;overflow-x:auto;gap:4px}.nav button{min-width:72px;justify-content:center;flex-direction:column;gap:2px;padding:7px;font-size:10px}.nav svg{width:18px;height:18px}main{padding:20px 16px 100px}.mobile-head{display:block}.topbar{align-items:flex-start}h1{font-size:29px}.top-actions .btn:not(.primary),.top-actions .btn.icon{display:none}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:16px}.hero{padding:22px}.hero h2{font-size:25px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-card{padding:9px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.dialog{padding:18px}.goal-card{grid-template-columns:1fr;text-align:center}.chart-row{grid-template-columns:90px 1fr 28px}}
+    @media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;padding:7px 6px;border-right:0;border-top:1px solid var(--line)}.brand,.sidebar-foot{display:none}.nav{display:flex;overflow-x:hidden;gap:2px}.nav button{min-width:0;flex:1;justify-content:center;flex-direction:column;gap:2px;padding:7px 2px;font-size:9px}.nav svg{width:17px;height:17px}main{padding:20px 16px 100px}.mobile-head{display:block}.demo-banner{align-items:flex-start;flex-direction:column;gap:4px;padding:10px 12px;margin-bottom:15px}.topbar{align-items:flex-start}.top-actions .btn.primary{padding:9px 11px;font-size:13px}h1{font-size:29px}.top-actions .btn:not(.primary),.top-actions .btn.icon{display:none}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.card{padding:16px}.hero{padding:22px}.hero h2{font-size:25px}.book-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.book-card{padding:9px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.dialog{padding:18px}.goal-card{grid-template-columns:1fr;text-align:center}.chart-row{grid-template-columns:90px 1fr 28px}}
     @media(max-width:420px){.stats{grid-template-columns:1fr}.book-grid{grid-template-columns:1fr 1fr}.book-meta small{font-size:11px}}
   </style>
 </head>
 <body>
+<!-- Shelfmark live demo. Premium import/export/backup code has been removed from this public build. -->
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
@@ -111,15 +117,16 @@
     </div>
   </aside>
   <main>
+    <div class="demo-banner"><div class="demo-badge">LIVE DEMO</div><span>Sample data only · Changes reset when the page reloads</span></div>
     <div class="mobile-head eyebrow">Shelfmark by KeptApps</div>
     <header class="topbar">
       <div><div class="eyebrow" id="eyebrow">Your private library</div><h1 id="page-title">Dashboard</h1><div class="subtle" id="page-subtitle">Everything you are reading, at a glance.</div></div>
-      <div class="top-actions"><button class="btn icon" id="theme-btn" title="Toggle theme">◐</button><button class="btn" data-open="import-modal">Import CSV</button><button class="btn primary" data-open="book-modal">+ Add book</button></div>
+      <div class="top-actions"><button class="btn icon" id="theme-btn" title="Toggle theme">◐</button><button class="btn demo-locked" type="button" data-demo-locked="CSV import">Import CSV</button><button class="btn primary" data-open="book-modal">+ Add book</button></div>
     </header>
 
     <section class="view active" id="dashboard-view">
       <div class="hero">
-        <div><div class="eyebrow" style="color:#b8eadb">Your next chapter</div><h2 id="hero-title">Build a library you can actually use.</h2><p id="hero-copy">Import from Goodreads or StoryGraph, track every series, and always know what to read next.</p><div class="actions"><button class="btn" id="pick-btn">Pick my next read</button><button class="btn ghost" style="color:white;border-color:rgba(255,255,255,.35)" data-open="import-modal">Import my books</button></div></div>
+        <div><div class="eyebrow" style="color:#b8eadb">Your next chapter</div><h2 id="hero-title">Your entire reading life, beautifully organized.</h2><p id="hero-copy">Track your library, TBR, series, goals, loans and reading stats — privately in your browser.</p><div class="actions"><button class="btn" id="pick-btn">Pick my next read</button><button class="btn ghost demo-locked" type="button" style="color:white;border-color:rgba(255,255,255,.35)" data-demo-locked="Goodreads & StoryGraph CSV import">CSV import in full version</button></div></div>
         <div class="hero-art" aria-hidden="true"><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span><span class="book-spine"></span></div>
       </div>
       <div class="grid stats" id="stats"></div>
@@ -148,14 +155,14 @@
 
     <section class="view" id="settings-view">
       <div class="grid settings-grid">
-        <div class="card setting"><div class="copy"><h3>Back up everything</h3><p>Download one file containing your complete library, settings and loans.</p></div><button class="btn" id="backup-btn">Back up</button></div>
-        <div class="card setting"><div class="copy"><h3>Restore a backup</h3><p>Move Shelfmark to a new device or restore an earlier copy.</p></div><button class="btn" id="restore-btn">Restore</button><input id="restore-input" type="file" accept="application/json" hidden></div>
-        <div class="card setting"><div class="copy"><h3>Export a spreadsheet</h3><p>Download your full library as a clean CSV file whenever you want.</p></div><button class="btn" id="export-btn">Export CSV</button></div>
-        <div class="card setting"><div class="copy"><h3>Sample library</h3><p>Load a small sample to explore every screen. This will replace current data.</p></div><button class="btn" id="sample-btn">Load sample</button></div>
+        <div class="card setting"><div class="copy"><h3>Back up everything</h3><p>Download one file containing your complete library, settings and loans.</p><div class="demo-lock-note">Full version feature</div></div><button class="btn demo-locked" type="button" data-demo-locked="Backup">Back up</button></div>
+        <div class="card setting"><div class="copy"><h3>Restore a backup</h3><p>Move Shelfmark to a new device or restore an earlier copy.</p><div class="demo-lock-note">Full version feature</div></div><button class="btn demo-locked" type="button" data-demo-locked="Restore">Restore</button></div>
+        <div class="card setting"><div class="copy"><h3>Export a spreadsheet</h3><p>Download your full library as a clean CSV file whenever you want.</p><div class="demo-lock-note">Full version feature</div></div><button class="btn demo-locked" type="button" data-demo-locked="CSV export">Export CSV</button></div>
+        <div class="card setting"><div class="copy"><h3>Reset live demo</h3><p>Restore the original sample books, loan and reading goal.</p></div><button class="btn" id="sample-btn">Reset demo</button></div>
         <div class="card setting"><div class="copy"><h3>Accent colour</h3><p>Choose the colour used throughout Shelfmark.</p></div><select id="accent-select"><option value="#1d6b59">Evergreen</option><option value="#7a4d8e">Mulberry</option><option value="#2e6287">Ink blue</option><option value="#a85642">Terracotta</option></select></div>
-        <div class="card setting"><div class="copy"><h3>Clear all data</h3><p>Erase this local library from this browser. Download a backup first.</p></div><button class="btn danger" id="clear-btn">Clear</button></div>
+        <div class="card setting"><div class="copy"><h3>Clear all data</h3><p>Available in the purchased version. The live demo always reloads with sample data.</p><div class="demo-lock-note">Full version feature</div></div><button class="btn danger demo-locked" type="button" data-demo-locked="Clear all data">Clear</button></div>
       </div>
-      <div class="footnote">Shelfmark stores data in this browser on this device. It does not create an account or upload your library.</div>
+      <div class="footnote">Live demo: changes stay only for this page session and reset when you reload. The purchased Shelfmark app saves locally in your browser.</div>
     </section>
   </main>
 </div>
@@ -172,7 +179,6 @@
   <div class="field full"><label>Cover image URL (optional)</label><input name="cover" type="url" placeholder="https://..."></div><div class="field full"><label>Notes or review</label><textarea name="notes"></textarea></div>
 </div><div class="dialog-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button type="button" class="btn danger" id="delete-book" hidden>Delete</button><button class="btn primary">Save book</button></div></form></div></div>
 
-<div class="modal" id="import-modal"><div class="dialog small"><div class="dialog-head"><div><div class="eyebrow">Bring your library</div><h2>Import a CSV</h2></div><button class="close" data-close>×</button></div><p class="subtle">Works with Goodreads exports, StoryGraph exports, and ordinary spreadsheets containing at least Title and Author columns.</p><div class="dropzone" id="dropzone"><h3>Choose or drop a CSV file</h3><p class="subtle">Nothing is uploaded. The file is read only in this browser.</p><input type="file" id="csv-input" accept=".csv,text/csv"></div><div class="import-result" id="import-result"></div><div class="dialog-actions"><button class="btn" data-close>Close</button></div></div></div>
 
 <div class="modal" id="goal-modal"><div class="dialog small"><div class="dialog-head"><div><div class="eyebrow">Reading challenge</div><h2>Set your yearly goal</h2></div><button class="close" data-close>×</button></div><form id="goal-form"><div class="field"><label>Books to finish this year</label><input name="goal" type="number" min="1" max="999" required></div><div class="dialog-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button class="btn primary">Save goal</button></div></form></div></div>
 
@@ -193,7 +199,7 @@
     goals:["A goal that grows with you","Reading goals","Track finished books, pages and progress this year."],
     loans:["No more missing books","Loan tracker","Remember who borrowed each book and when it is due."],
     analytics:["Your reading, made visible","Analytics","Discover the genres, formats and ratings behind your library."],
-    settings:["Your file, your data","Settings & backup","Back up, restore, export and personalize Shelfmark."]
+    settings:["Your file, your data","Settings & backup","Preview customization and full-version data tools."]
   };
   const sampleBooks = () => [
     {id:uid(),title:"The Midnight Library",author:"Matt Haig",status:"Finished",format:"Paperback",series:"",seriesNumber:"",genre:"Contemporary",tags:"magical realism, reflective",pages:304,year:2020,rating:4,spice:0,dateStarted:thisYear("01-12"),dateFinished:thisYear("01-19"),isbn:"",shelf:"Living room",cover:"",notes:"A thoughtful read about choices.",added:Date.now()-900000},
@@ -210,9 +216,15 @@
 
   function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
   function thisYear(md){ return `${new Date().getFullYear()}-${md}`; }
-  function defaults(){ return {books:[],loans:[],goal:24,theme:"light",accent:"#1d6b59"}; }
-  function loadState(){ try{ const raw=localStorage.getItem(STORAGE_KEY); return raw?{...defaults(),...JSON.parse(raw)}:defaults(); }catch(e){ return defaults(); } }
-  function saveState(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); document.getElementById("save-status").textContent=`Saved ${new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`; }
+  function defaults(){ return {books:[],loans:[],goal:12,theme:"light",accent:"#1d6b59"}; }
+  function demoState(){
+    const books=sampleBooks();
+    const loanBook=books.find(b=>b.title==="The Man Who Died Twice")||books[0];
+    const due=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+    return {books,loans:[{id:uid(),bookId:loanBook.id,borrower:"Alex",due,created:Date.now()-3*86400000,returned:null}],goal:12,theme:"light",accent:"#1d6b59"};
+  }
+  function loadState(){ return demoState(); }
+  function saveState(){ const el=document.getElementById("save-status");if(el)el.textContent="Demo changes are temporary"; }
   function esc(v=""){ return String(v).replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
   function slugLetters(title){ return title.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase(); }
   function coverColor(book){ const colors=["#1d6b59","#7a4d8e","#2e6287","#a85642","#8b6c43","#59694d"]; let n=[...book.title].reduce((a,c)=>a+c.charCodeAt(0),0); return colors[n%colors.length]; }
@@ -233,7 +245,7 @@
     document.getElementById("current-list").innerHTML=current.length?current.slice(0,5).map(bookRow).join(""):emptyState("No books in progress","Mark a book as Reading to see it here.");
     const pct=Math.min(100,Math.round(finished.length/Math.max(1,state.goal)*100));
     document.getElementById("goal-mini").innerHTML=`<div class="progress-ring" style="--p:${pct}"><span>${pct}%<small>${finished.length} of ${state.goal}</small></span></div><p class="quote">${finished.length>=state.goal?"Goal complete. Everything else is a bonus.":`${Math.max(0,state.goal-finished.length)} books to go. One page at a time.`}</p>`;
-    if(state.books.length){document.getElementById("hero-title").textContent=`${state.books.length} books. One beautifully organised library.`;document.getElementById("hero-copy").textContent=current.length?`You have ${current.length} book${current.length===1?"":"s"} in progress and ${tbr.length} waiting on your TBR.`:"Your shelves are organised. Choose something from your TBR when you are ready.";}
+    if(state.books.length && !document.getElementById("hero-title").dataset.picked){document.getElementById("hero-title").textContent="Your entire reading life, beautifully organized.";document.getElementById("hero-copy").textContent="Track your library, TBR, series, goals, loans and reading stats — privately in your browser.";}
   }
   function bookRow(b){ return `<div class="book-row"><div class="mini-cover" style="background:${coverColor(b)}">${esc(slugLetters(b.title))}</div><div><strong>${esc(b.title)}</strong><small>${esc(b.author)}${b.pages?` · ${b.pages} pages`:""}</small></div><span class="pill">${esc(b.status)}</span></div>`; }
   function emptyState(title,copy){ return `<div class="empty"><div class="empty-icon">⌑</div><h3>${title}</h3><p>${copy}</p></div>`; }
@@ -251,16 +263,10 @@
   function resetBookForm(){ const f=document.getElementById("book-form");f.reset();f.elements.id.value="";document.getElementById("book-modal-title").textContent="Add a book";document.getElementById("delete-book").hidden=true; }
   function editBook(id){ const b=state.books.find(x=>x.id===id);if(!b)return;const f=document.getElementById("book-form");Object.entries(b).forEach(([k,v])=>{if(f.elements[k])f.elements[k].value=v??""});document.getElementById("book-modal-title").textContent="Edit book";document.getElementById("delete-book").hidden=false;openModal("book-modal"); }
   function formObject(form){ return Object.fromEntries(new FormData(form).entries()); }
-  function normalStatus(v=""){ const s=v.toLowerCase().trim();if(s.includes("dnf")||s.includes("did not")||s.includes("did-not"))return "Did not finish";if(s.includes("currently")||s==="reading"||s==="in progress")return "Reading";if(s.includes("want")||s.includes("to-read")||s==="tbr")return "Want to read";if(s==="read"||s.includes("finished")||s.includes("complete"))return "Finished";return "Want to read"; }
-  function parseCSV(text){ const rows=[];let row=[],field="",quoted=false;for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1];if(c==='"'&&quoted&&n==='"'){field+='"';i++;}else if(c==='"'){quoted=!quoted;}else if(c===','&&!quoted){row.push(field);field="";}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&n==='\n')i++;row.push(field);field="";if(row.some(x=>x.trim()))rows.push(row);row=[];}else field+=c;}row.push(field);if(row.some(x=>x.trim()))rows.push(row);return rows; }
-  function importCSV(text){ const rows=parseCSV(text);if(rows.length<2)throw new Error("The CSV does not contain any book rows.");const headers=rows[0].map(h=>h.trim().toLowerCase().replace(/^\ufeff/,""));const find=(obj,aliases)=>{for(const a of aliases){const i=headers.indexOf(a);if(i>=0&&obj[i]!==undefined)return obj[i].trim()}return ""};let added=0,skipped=0;for(const r of rows.slice(1)){const title=find(r,["title","book title"]),author=find(r,["author","authors","author l-f"]);if(!title){skipped++;continue}const isbn=find(r,["isbn13","isbn","isbn/uid"]).replace(/^=+/,"").replace(/[\"']/g,"").trim(),rating=parseFloat(find(r,["my rating","star rating","rating"]))||0,pages=parseInt(find(r,["number of pages","pages"]))||0,status=normalStatus(find(r,["exclusive shelf","read status","status"])),dateRead=find(r,["date read","dates read","date finished"]),dateAdded=find(r,["date added","added"]),tags=find(r,["bookshelves","tags","genre","genres"]),format=find(r,["binding","format"])||"Other";const dupe=state.books.some(b=>(isbn&&b.isbn===isbn)||b.title.toLowerCase()===title.toLowerCase()&&b.author.toLowerCase()===(author||"Unknown author").toLowerCase());if(dupe){skipped++;continue}state.books.push({id:uid(),title,author:author||"Unknown author",status,format,series:"",seriesNumber:"",genre:tags.split(",")[0]||"",tags,pages,year:parseInt(find(r,["year published","original publication year","publication year"]))||"",rating:Math.min(5,Math.round(rating)),spice:0,dateStarted:"",dateFinished:toISODate(dateRead),isbn,shelf:"",cover:"",notes:find(r,["my review","review","private notes","notes"]),added:dateAdded?new Date(dateAdded).getTime()||Date.now():Date.now()});added++;}saveState();render();return {added,skipped}; }
-  function toISODate(v){ if(!v)return "";const first=v.split(/[,;]/)[0].trim(),d=new Date(first);if(isNaN(d))return "";return d.toISOString().slice(0,10); }
-  function download(name,content,type){ const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }
-  function csvCell(v){ const s=String(v??"");return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }
-  function exportCSV(){ const keys=["Title","Author","Status","Format","Series","Series Number","Genre","Tags","Pages","Year","Rating","Spice","Date Started","Date Finished","ISBN","Shelf","Notes"];const props=["title","author","status","format","series","seriesNumber","genre","tags","pages","year","rating","spice","dateStarted","dateFinished","isbn","shelf","notes"];const lines=[keys.join(","),...state.books.map(b=>props.map(k=>csvCell(b[k])).join(","))];download("Shelfmark-Library.csv",lines.join("\n"),"text/csv;charset=utf-8");toast("Library exported"); }
-  function randomPick(){ const pool=state.books.filter(b=>b.status==="Want to read");if(!pool.length){toast("Add a Want to read book first");return}const b=pool[Math.floor(Math.random()*pool.length)];document.getElementById("hero-title").textContent=`Read next: ${b.title}`;document.getElementById("hero-copy").textContent=`By ${b.author}${b.genre?` · ${b.genre}`:""}${b.pages?` · ${b.pages} pages`:""}. Not feeling it? Pick again.`;toast("Your next read is ready"); }
+  function randomPick(){ const pool=state.books.filter(b=>b.status==="Want to read");if(!pool.length){toast("Add a Want to read book first");return}const b=pool[Math.floor(Math.random()*pool.length)];document.getElementById("hero-title").dataset.picked="1";document.getElementById("hero-title").textContent=`Read next: ${b.title}`;document.getElementById("hero-copy").textContent=`By ${b.author}${b.genre?` · ${b.genre}`:""}${b.pages?` · ${b.pages} pages`:""}. Not feeling it? Pick again.`;toast("Your next read is ready"); }
 
   document.addEventListener("click",e=>{
+    const locked=e.target.closest("[data-demo-locked]");if(locked){toast(`${locked.dataset.demoLocked} is available in the full version`);return}
     const v=e.target.closest("[data-view]");if(v){showView(v.dataset.view);return}
     const o=e.target.closest("[data-open]");if(o){openModal(o.dataset.open);return}
     if(e.target.closest("[data-close]")||e.target.classList.contains("modal")){closeModals();return}
@@ -274,18 +280,10 @@
   ["search-input","status-filter","sort-select"].forEach(id=>document.getElementById(id).addEventListener(id==="search-input"?"input":"change",renderLibrary));
   document.getElementById("theme-btn").addEventListener("click",()=>{state.theme=state.theme==="dark"?"light":"dark";saveState();applyTheme();});
   document.getElementById("pick-btn").addEventListener("click",randomPick);
-  document.getElementById("backup-btn").addEventListener("click",()=>{download(`Shelfmark-Backup-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({...state,backupVersion:1,createdAt:new Date().toISOString()},null,2),"application/json");toast("Backup downloaded");});
-  document.getElementById("restore-btn").addEventListener("click",()=>document.getElementById("restore-input").click());
-  document.getElementById("restore-input").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data.books))throw new Error();if(!confirm(`Restore ${data.books.length} books? This replaces the library currently on this device.`))return;state={...defaults(),...data};saveState();render();toast("Backup restored")}catch(err){toast("That backup file could not be read")}e.target.value="";});
-  document.getElementById("export-btn").addEventListener("click",exportCSV);
-  document.getElementById("sample-btn").addEventListener("click",()=>{if(state.books.length&&!confirm("Replace the current library with sample books?"))return;state.books=sampleBooks();state.loans=[];state.goal=24;saveState();render();showView("dashboard");toast("Sample library loaded");});
+  document.getElementById("sample-btn").addEventListener("click",()=>{state=demoState();saveState();document.getElementById("hero-title").dataset.picked="";render();showView("dashboard");toast("Live demo reset");});
   document.getElementById("accent-select").addEventListener("change",e=>{state.accent=e.target.value;saveState();applyTheme();});
-  document.getElementById("clear-btn").addEventListener("click",()=>{if(!confirm("Clear every book, loan and setting from this browser? This cannot be undone without a backup."))return;state=defaults();saveState();render();showView("dashboard");toast("Local data cleared");});
-  const csvInput=document.getElementById("csv-input"),result=document.getElementById("import-result"),drop=document.getElementById("dropzone");
-  async function handleCSV(file){if(!file)return;try{const r=importCSV(await file.text());result.className="import-result show";result.innerHTML=`<strong>${r.added} books imported.</strong><br>${r.skipped} duplicate or incomplete rows skipped.`;toast(`${r.added} books imported`)}catch(err){result.className="import-result show";result.innerHTML=`<strong>Could not import this file.</strong><br>${esc(err.message)}`;}}
-  csvInput.addEventListener("change",e=>handleCSV(e.target.files[0]));["dragenter","dragover"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>handleCSV(e.dataTransfer.files[0]));
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModals()});
-  buildNav();render();
+  buildNav();render();saveState();
 })();
 </script>
 </body>
